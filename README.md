@@ -1,24 +1,28 @@
-# Block Template
+RedditBlock
+===========
 
-This repository serves as a "starter" repository for creating a new block.
+Polls the Reddit feed [https://www.reddit.com/r/<name_of_subreddit>.json](https://www.reddit.com/r/all.json)
 
-## How to use
+Can use `all.json` or `random.json` to get all Reddit posts or get a random subreddit.
 
-### Get the block template
+Properties
+--------------
+-   **polling_interval**: How often Reddit is polled. When using more than one query. Each query will be polled at a period equal to the *polling\_interval* times the number of queries.
+-   **retry_interval**: When a url request fails, how long to wait before attempting to try again.
+-   **queries**: List of subreddits.  
 
- 1. Fork this repository into your own block
- 1. Clone this repository and rename the folder
+Dependencies
+----------------
+None
 
+Commands
+----------------
+None
 
-### Rename the appropriate files
+Input
+-------
+Any list of signals.
 
- 1. Rename `example_block.py` to whatever your block name will be. We like to keep `_block` at the end of filenames that contain blocks.
- 1. In your new block Python file, rename the class to the new block's name. Do **not** put `Block` in the class name - this is implied.
- 1. Rename `test_example_block.py` to match your new block's class name. Always submit accompanying unit tests in the `tests` folder.
- 1. Rename `BLOCK_README.md` to `README.md` and update the documentation accordingly.
-
-
-## File Reference
-
- * **example_block.py** : This is the block code. Additional Python classes and files are definitely welcome. If the file contains a Block class, make sure the filename ends with `_block.py`. If the file represents a Base Block that is not discoverable by itself, have the filename end with `_base.py`.
- * **requirements.txt** : List out any Python dependencies this block requires. This file will be installed by pip when the block is installed. The command for installing the dependencies is `pip install -r requirements.txt`.
+Output
+---------
+Same list of signals as input.
