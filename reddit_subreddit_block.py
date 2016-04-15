@@ -31,12 +31,7 @@ class SubredditFeed(RESTPolling):
         super().start()
 
     def _prepare_url(self):
-        self.url = "https://www.reddit.com/r/nba.json"
-        # self.url = self.URL_FORMAT.format("nba")
-        print(self.url)
-        self._logger.info("No poll job")
-        return self.url
-        # self.url = self.URL_FORMAT.format(self.current_query)
+        self.url = self.URL_FORMAT.format(self.current_query)
 
     def process_signals(self, signals, input_id='default'):
         for signal in signals:
