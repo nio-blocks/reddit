@@ -13,23 +13,19 @@ class TestSubredditFeed(NIOBlockTestCase):
         # This will keep a list of signals notified for each output
         self.last_notified = defaultdict(list)
 
-    # def test_init_post_id(self):
-    #     """ Test that our url has a before query with the proper subreddit. """
-    #     blk = SubredditFeed()
-    #     blk.get_token = MagicMock()
-    #     blk._authenticate = MagicMock()
-    #     blk.init_post_id = MagicMock()
-    #     blk.post_ids = ["RedditID"]
-    #     self.configure_block(blk, {
-    #         "queries": ["baz"]
-    #     })
-    #     blk._prepare_url(False)
-    #     self.assertEqual(blk.url, "https://oauth.reddit.com/r/baz/new.json?before=RedditID")
+    @patch("requests.post")
+    def test_authenticate(self, mock_post):
+        """ Test that headers are properly set in _authenticate. """
+        blk = SubredditFeed()
+        mock_post.return_value = MagicMock()
+        blk.get_token = MagicMock(return_value="TEST TOKEN")
+        headers = blk._authenticate()
+        self.assertEqual(headers, {'User-Agent': 'nio', 'Authorization': 'bearer TEST TOKEN'})
 
     @patch("requests.post")
     @patch("requests.get")
     def test_prepare_url(self, mock_post, mock_get):
-        """ Test that our url has a before query parameter with the proper subreddit. """
+        """ Test that our url has a before query parameter and appends the proper subreddit. """
         blk = SubredditFeed()
         mock_post.return_value = MagicMock()
         mock_get.return_value = MagicMock()
@@ -37,25 +33,8 @@ class TestSubredditFeed(NIOBlockTestCase):
         self.configure_block(blk, {
             "queries": ["baz"]
         })
-        # blk._prepare_url(False)
         blk.poll()
         self.assertEqual(blk.url, "https://oauth.reddit.com/r/baz/new.json?before=RedditID")
-
-    def test_token_added_to_headers(self):
-        """ Test that our OAuth token gets added to HTTP headers """
-        blk = SubredditFeed()
-        blk.get_token = MagicMock(return_value="TEST TOKEN")
-        # Mock unneeded block setup calls
-        # blk._authenticate = MagicMock()
-        blk.init_post_id = MagicMock()
-        blk.post_ids = ["fake id"]
-        self.configure_block(blk, {
-            "queries": ["foo"]
-        })
-        my_headers = blk._prepare_url(False)
-        self.assertEqual(
-            my_headers['Authorization'],
-            "bearer TEST TOKEN")
 
     @patch.object(SubredditFeed, "_authenticate")
     @patch("requests.get")
@@ -85,13 +64,8 @@ class TestSubredditFeed(NIOBlockTestCase):
             }
         blk.poll()
 
-        import pdb; pdb.set_trace()
-
         self.assert_num_signals_notified(1)
         last_sig = self.last_notified['default'][0]
         self.assertEqual(last_sig.name, "uniqueRedditID")
         self.assertEqual(last_sig.subreddit, "IOT")
         self.assertEqual(last_sig.author, "the author")
-
-    # def signals_notified(self, signals, output_id='default'):
-    #     self.last_notified[output_id].extend(signals)

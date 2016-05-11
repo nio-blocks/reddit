@@ -15,6 +15,7 @@ class Creds(PropertyHolder):
     app_password = StringProperty(title='App Password', default='[[REDDIT_PASSWORD]]')
 
 class SubredditSignal(Signal):
+    """ Translates attributes from subreddit posts into Signal format """
     def __init__(self, data):
         super().__init__()
         for k in data:
@@ -23,16 +24,18 @@ class SubredditSignal(Signal):
 @Discoverable(DiscoverableType.block)
 class SubredditFeed(RESTPolling):
 
-    """ This block polls the Reddit feed for subreddits that match the queries.
+    """ This block polls the Reddit feed for the most recent posts in subreddits that match the queries.
 
-    Properties:
-        queries (List(str)): Reddit subreddits to query.
-        creds (APICredentials): API credentials
+        Properties:
+            creds (APICredentials): API credentials
     """
 
     version = VersionProperty('0.1.0')
 
     URL_FORMAT = ("https://oauth.reddit.com/r/{}/new.json?before={}")
+
+    # the default number of posts returned by the Reddit API
+    DEFAULT_LIMIT = 25
 
     creds = ObjectProperty(Creds, title='Credentials')
 
@@ -41,36 +44,64 @@ class SubredditFeed(RESTPolling):
         self.post_ids = []
 
     def configure(self, context):
+        """ Configures block, sets up a new instance for each query, and
+            captures the id of the most recent post.
+        """
         super().configure(context)
         for query in self.queries:
             self.init_post_id(query);
 
+    def start(self):
+        super().start()
+
+    def _authenticate(self):
+        """ Overridden from RESTPolling block.
+
+            Sets up headers with OAuth token.
+        """
+        self.token = self.get_token();
+        headers = {"Authorization": "bearer " + self.token, "User-Agent": "nio"}
+
+        return headers
+
     def init_post_id(self, query):
-        token = self.get_token();
-        headers = {"Authorization": "bearer " + token, "User-Agent": "nio"}
+        """ Makes the initial request to determine the id of the most recent
+            post, which becomes the 'before' query parameter, i.e., the marker
+            from where to start polling.
+
+            Args:
+                query (string): The name of the subreddit.
+
+        """
+        headers = self._authenticate()
         response = requests.get(self.URL_FORMAT.format(query, None), headers=headers)
         resp = response.json()
         self.post_ids.append(resp['data']['children'][0]['data']['name'])
 
-    def start(self):
-        super().start()
-
     def get_token(self):
+        """ Gets token required for header in each request.
+
+            Returns:
+                access_token (string): An identifier that allows OAuth API access
+        """
+
         client_auth = requests.auth.HTTPBasicAuth(self.creds.client_id, self.creds.app_secret)
         post_data = {"grant_type": "password", "username": self.creds.app_username, "password": self.creds.app_password}
         headers = {"User-Agent": "nio"}
         response = requests.post("https://www.reddit.com/api/v1/access_token", auth=client_auth, data=post_data, headers=headers)
+
         return response.json()['access_token']
 
     def _get_post_id(self, signal):
-        """ Returns a uniquely identifying string (name) for a post.
+        """ Overridden from RESTPolling block.
 
-        Args:
-            signal (dict): A signal.
-        Returns:
-            name (string): A string that uniquely identifies a
-                         post. None indicated that the post should
-                         be treated as unique.
+            Returns a uniquely identifying string (name) for a signal.
+
+            Args:
+                signal (dict): A signal.
+            Returns:
+                name (string): A string that uniquely identifies a
+                             signal.
         """
 
         return signal.name
@@ -78,31 +109,35 @@ class SubredditFeed(RESTPolling):
     def _prepare_url(self, paging):
         """ Overridden from RESTPolling block.
 
-        Appends the Client ID to the response string and builds the headers dictionary.
+            Calls _authenticate to build the headers, and appends the current
+            query and the post_id (before query parameter) to the URL.
 
-        Args:
-            paging (bool): Are we paging?
+            Args:
+                paging (bool): Are we paging?
 
-        Returns:
-            headers
+            Returns:
+                headers (dict):  the headers that will be sent to the poll method in RESTPolling.
         """
-        token = self.get_token();
-        headers = {"Authorization": "bearer " + token, "User-Agent": "nio"}
+
+        headers = self._authenticate()
         self.url = self.URL_FORMAT.format(self.current_query, self.post_ids[self._idx])
 
         return headers
 
     def _process_response(self, resp):
-        """ Extract posts from the Subreddit API response object.
+        """ Overridden from RESTPolling block.
 
-        Args:
-            resp (Response)
+            Extract posts from the Subreddit API response object.
 
-        Returns:
-            signals (list(Signal)): List of signals to notify, each of which
-                corresponds to a new Subreddit post.
-            paging (bool): Denotes whether or not paging requests are necessary.
+            Args:
+                resp (Response): the response object containing the most recent posts.
+
+            Returns:
+                signals (list(Signal)): List of signals to notify, each of which
+                    corresponds to a new Subreddit post since the last poll.
+                paging (bool): Denotes whether or not paging requests are necessary.
         """
+
         signals = []
         paging = False
         resp = resp.json()
@@ -116,7 +151,7 @@ class SubredditFeed(RESTPolling):
         if signals:
             self.post_ids[self._idx] = self._get_post_id(signals[0])
 
-        if len(posts) == 25:
+        if len(posts) == self.DEFAULT_LIMIT:
             paging = True
 
         return signals, paging
