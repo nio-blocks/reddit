@@ -8,8 +8,7 @@ from nio.common.signal.base import Signal
 import requests
 
 class Creds(PropertyHolder):
-    """ PropertyHolder for Reddit credentials.
-    """
+    """ PropertyHolder for Reddit credentials. """
     client_id = StringProperty(title='Client ID', default='[[REDDIT_CLIENT_ID]]')
     app_secret = StringProperty(title='App Secret', default='[[REDDIT_SECRET]]')
     app_username = StringProperty(title='App Username', default='[[REDDIT_USERNAME]]')
@@ -43,22 +42,14 @@ class SubredditFeed(RESTPolling):
 
     def configure(self, context):
         super().configure(context)
-        self._logger.debug(self.queries)
         for query in self.queries:
-            self._logger.debug("QUERY: " + query)
             self.init_post_id(query);
 
     def init_post_id(self, query):
-        self._logger.debug("inside init_post_id")
         token = self.get_token();
         headers = {"Authorization": "bearer " + token, "User-Agent": "nio"}
-        self._logger.debug(self._idx)
-        self._logger.debug(self.post_ids)
-        # TODO: set first post_id to none (we don't have a before query param)
         response = requests.get(self.URL_FORMAT.format(query, None), headers=headers)
         resp = response.json()
-        self._logger.debug("made it through get request")
-        self._logger.debug(resp['data']['children'][0]['data']['name'])
         self.post_ids.append(resp['data']['children'][0]['data']['name'])
 
     def start(self):
@@ -71,17 +62,18 @@ class SubredditFeed(RESTPolling):
         response = requests.post("https://www.reddit.com/api/v1/access_token", auth=client_auth, data=post_data, headers=headers)
         return response.json()['access_token']
 
-    def _get_post_id(self, post):
+    def _get_post_id(self, signal):
         """ Returns a uniquely identifying string (name) for a post.
 
         Args:
-            post (dict): A post.
+            signal (dict): A signal.
         Returns:
             name (string): A string that uniquely identifies a
                          post. None indicated that the post should
                          be treated as unique.
         """
-        return post['data']['name']
+
+        return signal.name
 
     def _prepare_url(self, paging):
         """ Overridden from RESTPolling block.
@@ -96,9 +88,7 @@ class SubredditFeed(RESTPolling):
         """
         token = self.get_token();
         headers = {"Authorization": "bearer " + token, "User-Agent": "nio"}
-        response = requests.get(self.URL_FORMAT.format(self.current_query, self.post_ids[self._idx]), headers=headers)
-        self.url = response.url
-        self._logger.debug("********")
+        self.url = self.URL_FORMAT.format(self.current_query, self.post_ids[self._idx])
 
         return headers
 
@@ -120,21 +110,13 @@ class SubredditFeed(RESTPolling):
 
         self._logger.debug("Reddit response contains %d posts" % len(posts))
 
-        if posts:
-            # self._logger.debug("$$$ Setting new post id $$$")
-            # self._logger.debug("Old Post id: " + self.post_ids[self._idx])
-            self._logger.debug("###")
-            self._logger.debug(self.post_ids)
-            self._logger.debug(self._idx)
-            self.post_ids[self._idx] = self._get_post_id(posts[0])
-            self._logger.debug(self.post_ids[self._idx])
-            # self._logger.debug("Newest Post id: " + self.post_ids[self._idx])
         for post in posts:
-            self._logger.debug(SubredditSignal(post))
-            self._logger.debug(signals)
-            signals.append(SubredditSignal(post))
+            signals.append(SubredditSignal(post['data']))
+
+        if signals:
+            self.post_ids[self._idx] = self._get_post_id(signals[0])
+
         if len(posts) == 25:
-            self._logger.debug("Paging set to true")
             paging = True
 
         return signals, paging
