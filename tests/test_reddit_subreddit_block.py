@@ -13,56 +13,55 @@ class TestSubredditFeed(NIOBlockTestCase):
         # This will keep a list of signals notified for each output
         self.last_notified = defaultdict(list)
 
-    @patch("requests.post")
-    def test_authenticate(self, mock_post):
+    def test_authenticate(self):
         """ Test that headers are properly set in _authenticate. """
         blk = SubredditFeed()
-        mock_post.return_value = MagicMock()
         blk.get_token = MagicMock(return_value="TEST TOKEN")
         headers = blk._authenticate()
-        self.assertEqual(headers, {'User-Agent': 'nio', 'Authorization': 'bearer TEST TOKEN'})
+        self.assertEqual(headers,
+                         {'User-Agent': 'nio',
+                          'Authorization': 'bearer TEST TOKEN'})
 
-    @patch("requests.post")
-    @patch("requests.get")
-    def test_prepare_url(self, mock_post, mock_get):
-        """ Test that our url has a before query parameter and appends the proper subreddit. """
+    def test_prepare_url(self):
+        """ Test url has a before query param and appends proper subreddit. """
         blk = SubredditFeed()
-        mock_post.return_value = MagicMock()
-        mock_get.return_value = MagicMock()
+        blk.init_post_id = MagicMock()
+        blk._authenticate = MagicMock()
         blk.post_ids = ["RedditID"]
         self.configure_block(blk, {
             "queries": ["baz"]
         })
         blk.poll()
-        self.assertEqual(blk.url, "https://oauth.reddit.com/r/baz/new.json?before=RedditID")
+        self.assertEqual(
+            blk.url, "https://oauth.reddit.com/r/baz/new.json?before=RedditID")
 
-    @patch.object(SubredditFeed, "_authenticate")
-    @patch("requests.get")
-    def test_process_response(self, mock_get, mock_auth):
-        """ Test that our _process_response method returns a single signal object. """
+    def test_process_response(self):
+        """ Test that _process_response returns a single signal object. """
         blk = SubredditFeed()
-        blk.get_token = MagicMock()
+        blk._authenticate = MagicMock()
+        blk.init_post_id = MagicMock()
+        blk.post_ids = ["RedditID"]
         self.configure_block(blk, {
             "queries": [
-                "foo",
-                "bar"
+                "foo"
             ]
         })
-        mock_get.return_value = MagicMock()
-        mock_get.return_value.status_code = 200
-        mock_get.return_value.json.return_value = \
-            {'data':
-                {'children': [
-                    {'data':
-                        {
-                            'name': 'uniqueRedditID',
-                            "subreddit": "IOT",
-                            "author": "the author"
-                        }
+        expected_response = {
+            'data': {
+                'children': [{
+                    'data': {
+                        "name": 'uniqueRedditID',
+                        "subreddit": "IOT",
+                        "author": "the author"
                     }
-                ]}
+                }]
             }
-        blk.poll()
+        }
+        with patch("requests.get") as mock_get:
+            mock_get.return_value = MagicMock()
+            mock_get.return_value.status_code = 200
+            mock_get.return_value.json.return_value = expected_response
+            blk.poll()
 
         self.assert_num_signals_notified(1)
         last_sig = self.last_notified['default'][0]
