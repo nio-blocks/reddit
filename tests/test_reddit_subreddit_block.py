@@ -67,3 +67,28 @@ class TestSubredditFeed(NIOBlockTestCase):
         self.assertEqual(last_sig.name, "uniqueRedditID")
         self.assertEqual(last_sig.subreddit, "IOT")
         self.assertEqual(last_sig.author, "the author")
+
+    def test_process_response_exception(self):
+        """ Test that _process_response can handle exceptions """
+        blk = SubredditFeed()
+        blk.init_post_id = MagicMock()
+        blk._epilogue = MagicMock()
+        blk.get_token = MagicMock(return_value="TEST TOKEN")
+        blk.post_ids = ["RedditID"]
+        self.configure_block(blk, {
+            "queries": [
+                "foo"
+            ]
+        })
+        mock_resp = MagicMock()
+        # We want to simulate an exception when trying to parse json
+        mock_resp.json = MagicMock(side_effect=AttributeError)
+        mock_resp.status_code = 200
+        with patch("requests.get") as mock_get:
+            mock_get.return_value = mock_resp
+            blk.poll()
+
+        # We should not have notified any signals with the exception
+        self.assert_num_signals_notified(0)
+        # But the epilogue should have still been called to generate the poll
+        blk._epilogue.assert_called_once_with()

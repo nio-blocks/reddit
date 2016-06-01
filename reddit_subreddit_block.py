@@ -2,7 +2,7 @@ from .http_blocks.rest.rest_block import RESTPolling
 from nio.common.discovery import Discoverable, DiscoverableType
 from nio.metadata.properties import VersionProperty
 from nio.metadata.properties import PropertyHolder, StringProperty, \
-    ObjectProperty, BoolProperty
+    ObjectProperty
 from nio.common.signal.base import Signal
 
 import requests
@@ -168,8 +168,16 @@ class SubredditFeed(RESTPolling):
 
         signals = []
         paging = False
-        resp = resp.json()
-        posts = resp['data']['children']
+        try:
+            resp = resp.json()
+            posts = resp['data']['children']
+        except:
+            # We don't expect this to get hit too often, because we know that
+            # we have a 200 response by the time we get here. But we've seen
+            # the Reddit API return some non-JSON even with a 200 at times
+            self._logger.exception("Error processsing response: {}".format(
+                resp.text))
+            posts = []
 
         self._logger.debug("Reddit response contains %d posts" % len(posts))
 
