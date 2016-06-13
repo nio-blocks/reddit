@@ -2,7 +2,7 @@ from .http_blocks.rest.rest_block import RESTPolling
 from nio.common.discovery import Discoverable, DiscoverableType
 from nio.metadata.properties import VersionProperty
 from nio.metadata.properties import PropertyHolder, StringProperty, \
-    ObjectProperty, BoolProperty
+    ObjectProperty
 from nio.common.signal.base import Signal
 
 import requests
@@ -46,6 +46,7 @@ class SubredditFeed(RESTPolling):
     def __init__(self):
         super().__init__()
         self.post_ids = []
+        self.token = None
 
     def configure(self, context):
         """
@@ -65,13 +66,9 @@ class SubredditFeed(RESTPolling):
         """
         Overridden from RESTPolling block.
 
-        Sets up headers with OAuth token.
+        Retrieves the OAuth token and saves it to the instance
         """
         self.token = self.get_token()
-        headers = {"Authorization": "bearer " + self.token,
-                   "User-Agent": "nio"}
-
-        return headers
 
     def init_post_id(self, query):
         """
@@ -82,7 +79,7 @@ class SubredditFeed(RESTPolling):
 
         Args: query (string): The name of the subreddit.
         """
-        headers = self._authenticate()
+        headers = self._get_headers()
         response = requests.get(self.URL_FORMAT.format(query, None),
                                 headers=headers)
         resp = response.json()
@@ -95,6 +92,7 @@ class SubredditFeed(RESTPolling):
         Returns: access_token (string): Identifier that allows OAuth API access
         """
 
+        self._logger.debug("Obtaining access token")
         client_auth = requests.auth.HTTPBasicAuth(self.creds.client_id,
                                                   self.creds.app_secret)
         post_data = {"grant_type": "password",
@@ -120,24 +118,39 @@ class SubredditFeed(RESTPolling):
 
         return signal.name
 
+    def _get_headers(self):
+        """ Get the headers for a request using our current token.
+
+        If the token does not exist, this method will call authenticate
+        to attempt to retrieve a valid token.
+
+        Returns:
+            headers (dict): A dictionary containing the HTTP headers for
+                a valid request
+        """
+        if not self.token:
+            self._authenticate()
+
+        return {
+            "Authorization": "bearer " + self.token,
+            "User-Agent": "nio"
+        }
+
     def _prepare_url(self, paging):
         """
         Overridden from RESTPolling block.
 
-        Calls _authenticate to build the headers, and appends the current
-        query and the post_id (before query parameter) to the URL.
+        Appends the current query and the post_id (before query parameter)
+        to the URL.
 
         Args: paging (bool): Are we paging?
 
         Returns:
         headers (dict): the headers sent to poll method in RESTPolling.
         """
-
-        headers = self._authenticate()
         self.url = self.URL_FORMAT.format(self.current_query,
                                           self.post_ids[self._idx])
-
-        return headers
+        return self._get_headers()
 
     def _process_response(self, resp):
         """
@@ -155,8 +168,16 @@ class SubredditFeed(RESTPolling):
 
         signals = []
         paging = False
-        resp = resp.json()
-        posts = resp['data']['children']
+        try:
+            resp = resp.json()
+            posts = resp['data']['children']
+        except:
+            # We don't expect this to get hit too often, because we know that
+            # we have a 200 response by the time we get here. But we've seen
+            # the Reddit API return some non-JSON even with a 200 at times
+            self._logger.exception("Error processsing response: {}".format(
+                resp.text))
+            posts = []
 
         self._logger.debug("Reddit response contains %d posts" % len(posts))
 
