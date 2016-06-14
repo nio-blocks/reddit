@@ -21,6 +21,14 @@ class TestSubredditFeed(NIOBlockTestCase):
                          {'User-Agent': 'nio',
                           'Authorization': 'bearer TEST TOKEN'})
 
+    def test_authenticate_error(self):
+        """ Test that headers are properly set after _authenticate. """
+        blk = SubredditFeed()
+        # Simulate a failure to parse JSON in the token retrieval
+        blk.get_token = MagicMock(side_effect=ValueError)
+        blk._authenticate()
+        self.assertIsNone(blk.token)
+
     def test_prepare_url(self):
         """ Test url has a before query param and appends proper subreddit. """
         blk = SubredditFeed()

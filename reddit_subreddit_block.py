@@ -66,9 +66,14 @@ class SubredditFeed(RESTPolling):
         """
         Overridden from RESTPolling block.
 
-        Retrieves the OAuth token and saves it to the instance
+        Retrieves the OAuth token and saves it to the instance. If there is
+        an error during authentication, the token will be set to None.
         """
-        self.token = self.get_token()
+        try:
+            self.token = self.get_token()
+        except:
+            self._logger.exception("Error authenticating, invalidating token")
+            self.token = None
 
     def init_post_id(self, query):
         """
