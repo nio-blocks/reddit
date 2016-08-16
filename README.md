@@ -27,7 +27,7 @@ None
 
 Output
 ---------
-Creates a new signal for each Reddit post. Every field on the Post will become a signal attribute. Details about the Facebook Posts can be found
+Creates a new signal for each Reddit post. Every field on the Post will become a signal attribute. Details about the Reddit Posts can be found
 [here](https://github.com/reddit/reddit/wiki/JSON). The following is a sample of commonly included attributes, but note that not all will be included on every signal:
 
 - domain
