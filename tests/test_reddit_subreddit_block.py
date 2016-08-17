@@ -1,15 +1,11 @@
 from collections import defaultdict
-from nio.util.support.block_test_case import NIOBlockTestCase
+from nio.testing.block_test_case import NIOBlockTestCase
 from ..reddit_subreddit_block import SubredditFeed
 from unittest.mock import patch, MagicMock
+from nio.block.terminals import DEFAULT_TERMINAL
 
 
 class TestSubredditFeed(NIOBlockTestCase):
-
-    def setUp(self):
-        super().setUp()
-        # This will keep a list of signals notified for each output
-        self.last_notified = defaultdict(list)
 
     def test_authenticate(self):
         """ Test that headers are properly set after _authenticate. """
@@ -71,7 +67,7 @@ class TestSubredditFeed(NIOBlockTestCase):
             blk.poll()
 
         self.assert_num_signals_notified(1)
-        last_sig = self.last_notified['default'][0]
+        last_sig = self.last_notified[DEFAULT_TERMINAL][0]
         self.assertEqual(last_sig.name, "uniqueRedditID")
         self.assertEqual(last_sig.subreddit, "IOT")
         self.assertEqual(last_sig.author, "the author")
