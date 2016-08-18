@@ -28,55 +28,34 @@ None
 Output
 ---------
 Creates a new signal for each Reddit post. Every field on the Post will become a signal attribute. Details about the Reddit Posts can be found
-[here](https://github.com/reddit/reddit/wiki/JSON). The following is a sample of commonly included attributes, but note that not all will be included on every signal:
+[here](https://github.com/reddit/reddit/wiki/JSON#link-implements-votable--created). The following is a sample of commonly included attributes, but note that not all will be included on every signal:
 
-- `domain`
-- `banned_by`
-- `media_embed`
-- `subreddit`
-- `selftext_html`
-- `selftext`
-- `likes`
-- `suggested_sort`
-- `user_reports`
-- `secure_media`
-- `id`
-- `from_kind`
-- `archived`
-- `clicked`
-- `report_reasons`
-- `author`
-- `media`
-- `score`
-- `approved_by`
-- `over_18`
-- `hidden`
-- `preview`
-- `num_comments`
-- `thumbnail`
-- `subreddit_id`
-- `hide_score`
-- `edited`
-- `link_flair_css_class`
-- `author_flair_css_class`
-- `downs`
-- `secure_media_embed`
-- `saved`
-- `post_hint`
-- `stickied`
-- `from`
-- `is_self`
-- `from_id`
-- `permalink`
-- `locked`
-- `name`
-- `created`
-- `url`
-- `author_flair_text`
-- `title`
-- `created_utc`
-- `distinguished`
-- `mod_reports`
-- `visited`
-- `num_reports`
-- `ups`
+```
+{
+  domain: string,
+  banned_by: string,
+  subreddit: string,
+  selftext: string,
+  likes: int,
+  user_reports: array,
+  id: string, 
+  archived: boolean,
+  clicked: boolean,
+  author: string,
+  score: int,
+  approved_by: string,
+  over_18: boolean,
+  hidden: boolean,
+  num_comments: int,
+  thumbnail: string,
+  subreddit_id: string,
+  hide_score: boolean,
+  edited: boolean,
+  saved: boolean,
+  name: string,
+  created: datetime,
+  url: string,
+  title: string,
+  visited: boolean,
+}
+```
