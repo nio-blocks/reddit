@@ -7,10 +7,10 @@ Can use `all` to get all Reddit posts or `random` to get a random subreddit.
 
 Properties
 --------------
--   **polling_interval**: How often Reddit is polled. When using more than one query. Each query will be polled at a period equal to the *polling\_interval* times the number of queries.
+-   **polling_interval**: How often Reddit is polled. When using more than one query. Each query will be polled at a period equal to the `polling_interval` times the number of `queries`.
 -   **retry_interval**: When a url request fails, how long to wait before attempting to try again.
 -   **queries**: List of subreddits.  
--   **creds**: Reddit API credentials (environmental variables)
+-   **creds**: Reddit API credentials.
 
 Dependencies
 ----------------
@@ -28,59 +28,34 @@ None
 Output
 ---------
 Creates a new signal for each Reddit post. Every field on the Post will become a signal attribute. Details about the Reddit Posts can be found
-[here](https://github.com/reddit/reddit/wiki/JSON). The following is a sample of commonly included attributes, but note that not all will be included on every signal:
+[here](https://github.com/reddit/reddit/wiki/JSON#link-implements-votable--created). The following is a sample of commonly included attributes, but note that not all will be included on every signal:
 
-- domain
-- banned_by
-- media_embed
-- subreddit
-- selftext_html
-- selftext
-- likes
-- suggested_sort
-- user_reports
-- secure_media
-- link_flair_text
-- id
-- from_kind
-- gilded
-- archived
-- clicked
-- report_reasons
-- author
-- media
-- score
-- approved_by
-- over_18
-- hidden
-- preview
-- num_comments
-- thumbnail
-- subreddit_id
-- hide_score
-- edited
-- link_flair_css_class
-- author_flair_css_class
-- downs
-- secure_media_embed
-- saved
-- removal_reason
-- post_hint
-- stickied
-- from
-- is_self
-- from_id
-- permalink
-- locked
-- name
-- created
-- url
-- author_flair_text
-- quarantine
-- title
-- created_utc
-- distinguished
-- mod_reports
-- visited
-- num_reports
-- ups
+```
+{
+  domain: string,
+  banned_by: string,
+  subreddit: string,
+  selftext: string,
+  likes: int,
+  user_reports: array,
+  id: string, 
+  archived: boolean,
+  clicked: boolean,
+  author: string,
+  score: int,
+  approved_by: string,
+  over_18: boolean,
+  hidden: boolean,
+  num_comments: int,
+  thumbnail: string,
+  subreddit_id: string,
+  hide_score: boolean,
+  edited: boolean,
+  saved: boolean,
+  name: string,
+  created: datetime,
+  url: string,
+  title: string,
+  visited: boolean,
+}
+```

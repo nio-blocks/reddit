@@ -1,9 +1,9 @@
 from .http_blocks.rest.rest_block import RESTPolling
-from nio.common.discovery import Discoverable, DiscoverableType
-from nio.metadata.properties import VersionProperty
-from nio.metadata.properties import PropertyHolder, StringProperty, \
+from nio.util.discovery import discoverable
+from nio.properties import VersionProperty
+from nio.properties import PropertyHolder, StringProperty, \
     ObjectProperty
-from nio.common.signal.base import Signal
+from nio.signal.base import Signal
 
 import requests
 
@@ -24,7 +24,7 @@ class SubredditSignal(Signal):
     pass
 
 
-@Discoverable(DiscoverableType.block)
+@discoverable
 class SubredditFeed(RESTPolling):
     """
     This block polls Reddit feed.
@@ -56,7 +56,7 @@ class SubredditFeed(RESTPolling):
         recent post.
         """
         super().configure(context)
-        for query in self.queries:
+        for query in self.queries():
             self.init_post_id(query)
 
     def start(self):
@@ -72,7 +72,7 @@ class SubredditFeed(RESTPolling):
         try:
             self.token = self.get_token()
         except:
-            self._logger.exception("Error authenticating, invalidating token")
+            self.logger.exception("Error authenticating, invalidating token")
             self.token = None
 
     def init_post_id(self, query):
@@ -97,12 +97,12 @@ class SubredditFeed(RESTPolling):
         Returns: access_token (string): Identifier that allows OAuth API access
         """
 
-        self._logger.debug("Obtaining access token")
-        client_auth = requests.auth.HTTPBasicAuth(self.creds.client_id,
-                                                  self.creds.app_secret)
+        self.logger.debug("Obtaining access token")
+        client_auth = requests.auth.HTTPBasicAuth(self.creds().client_id(),
+                                                  self.creds().app_secret())
         post_data = {"grant_type": "password",
-                     "username": self.creds.app_username,
-                     "password": self.creds.app_password}
+                     "username": self.creds().app_username(),
+                     "password": self.creds().app_password()}
         headers = {"User-Agent": "nio"}
         response = requests.post("https://www.reddit.com/api/v1/access_token",
                                  auth=client_auth,
@@ -180,11 +180,11 @@ class SubredditFeed(RESTPolling):
             # We don't expect this to get hit too often, because we know that
             # we have a 200 response by the time we get here. But we've seen
             # the Reddit API return some non-JSON even with a 200 at times
-            self._logger.exception("Error processsing response: {}".format(
+            self.logger.exception("Error processsing response: {}".format(
                 resp.text))
             posts = []
 
-        self._logger.debug("Reddit response contains %d posts" % len(posts))
+        self.logger.debug("Reddit response contains %d posts" % len(posts))
 
         for post in posts:
             signals.append(SubredditSignal(post['data']))
