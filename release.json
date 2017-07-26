@@ -1,5 +1,5 @@
 {
-  "nio/RedditBlock": {
+  "nio/SubredditFeed": {
     "Language": "Python",
     "Reference": "github.com/nio-blocks/reddit.git@v1.0.0",
     "Version": "1.0.0"
