@@ -1,5 +1,5 @@
 {
-    "nio/RedditBlock": {
+    "nio/SubredditFeed": {
         "Properties": {
             "retry_interval": {
                 "description": "When a url request fails, how long to wait before attempting to try again."
