@@ -1,28 +1,10 @@
 {
-    "nio/SubredditFeed": {
-        "Properties": {
-            "retry_interval": {
-                "description": "When a url request fails, how long to wait before attempting to try again."
-            },
-            "queries": {
-                "description": "List of subreddits."
-            },
-            "polling_interval": {
-                "description": "How often Reddit is polled. When using more than one query. Each query will be polled at a period equal to the `polling_interval` times the number of `queries`."
-            },
-            "creds": {
-                "description": "Reddit API credentials."
-            }
-        },
-        "Output": {
-            "Description": "Creates a new signal for each Reddit post. Every field on the Post will become a signal attribute. Details about the Reddit Posts can be found\n[here](https://github.com/reddit/reddit/wiki/JSON#link-implements-votable--created). The following is a sample of commonly included attributes, but note that not all will be included on every signal:\n```\n{\ndomain: string,\nbanned_by: string,\nsubreddit: string,\nselftext: string,\nlikes: int,\nuser_reports: array,\nid: string,\narchived: boolean,\nclicked: boolean,\nauthor: string,\nscore: int,\napproved_by: string,\nover_18: boolean,\nhidden: boolean,\nnum_comments: int,\nthumbnail: string,\nsubreddit_id: string,\nhide_score: boolean,\nedited: boolean,\nsaved: boolean,\nname: string,\ncreated: datetime,\nurl: string,\ntitle: string,\nvisited: boolean,\n}\n```"
-        },
-        "Category": "WebService",
-        "Commands": {},
-        "Description": "Polls the `new` Reddit feed [https://www.reddit.com/r/all/new.json](https://www.reddit.com/r/<subreddit name>/new.json) and returns the most recent posts from each specified (queried) subreddit.\nCan use `all` to get all Reddit posts or `random` to get a random subreddit.",
-        "Input": {
-            "Description": "None"
-        },
-        "Version": "1.0.0"
-    }
+  "nio/SubredditFeed": {
+    "version": "0.0.1",
+    "description": "",
+    "inputs": {},
+    "outputs": {},
+    "properties": {},
+    "commands": {}
+  }
 }
