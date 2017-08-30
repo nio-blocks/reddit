@@ -1,34 +1,35 @@
-RedditBlock
-===========
-
-Polls the `new` Reddit feed [https://www.reddit.com/r/all/new.json](https://www.reddit.com/r/<subreddit name>/new.json) and returns the most recent posts from each specified (queried) subreddit.
-
-Can use `all` to get all Reddit posts or `random` to get a random subreddit.
+SubredditFeed
+=============
+Polls the `new` Reddit feed [https://www.reddit.com/r/all/new.json](https://www.reddit.com/r/<subreddit name>/new.json) and returns the most recent posts from each specified (queried) subreddit.  Can use `all` to get all Reddit posts or `random` to get a random subreddit.
 
 Properties
---------------
--   **polling_interval**: How often Reddit is polled. When using more than one query. Each query will be polled at a period equal to the `polling_interval` times the number of `queries`.
--   **retry_interval**: When a url request fails, how long to wait before attempting to try again.
--   **queries**: List of subreddits.  
--   **creds**: Reddit API credentials.
+----------
+- **creds**: Reddit API credentials.
+- **include_query**: Whether to include queries in request to facebook.
+- **polling_interval**: How often Reddit is polled. When using more than one query. Each query will be polled at a period equal to the *polling interval* times the number of queries.
+- **queries**: Queries to include on request to Reddit.
+- **retry_interval**: When a url request fails, how long to wait before attempting to try again.
+- **retry_limit**: Number if times to retry on a poll.
 
-Dependencies
-----------------
--   [requests](https://pypi.python.org/pypi/requests/)
--   [RESTPolling Block](https://github.com/nio-blocks/http_blocks/blob/master/rest/rest_block.py)
+Inputs
+------
+- **default**: Any list of signals.
+
+Outputs
+-------
+- **default**: Creates a new signal for each Reddit post. Every field on the Post will become a signal attribute. Details about the Reddit Posts can be found [here](https://github.com/reddit/reddit/wiki/JSON#link-implements-votable--created).
 
 Commands
-----------------
+--------
 None
 
-Input
--------
-None
+Dependencies
+------------
+requests
 
-Output
----------
-Creates a new signal for each Reddit post. Every field on the Post will become a signal attribute. Details about the Reddit Posts can be found
-[here](https://github.com/reddit/reddit/wiki/JSON#link-implements-votable--created). The following is a sample of commonly included attributes, but note that not all will be included on every signal:
+Output Example
+--------------
+The following is a sample of commonly included attributes, but note that not all will be included on every signal:
 
 ```
 {

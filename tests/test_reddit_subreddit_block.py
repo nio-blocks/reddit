@@ -1,8 +1,9 @@
-from collections import defaultdict
-from nio.testing.block_test_case import NIOBlockTestCase
-from ..reddit_subreddit_block import SubredditFeed
 from unittest.mock import patch, MagicMock
+
+from nio.testing.block_test_case import NIOBlockTestCase
 from nio.block.terminals import DEFAULT_TERMINAL
+
+from ..reddit_subreddit_block import SubredditFeed
 
 
 class TestSubredditFeed(NIOBlockTestCase):

@@ -1,11 +1,10 @@
-from .http_blocks.rest.rest_block import RESTPolling
-from nio.util.discovery import discoverable
-from nio.properties import VersionProperty
+import requests
+
 from nio.properties import PropertyHolder, StringProperty, \
-    ObjectProperty
+    ObjectProperty, VersionProperty
 from nio.signal.base import Signal
 
-import requests
+from .rest_polling.rest_block import RESTPolling
 
 
 class Creds(PropertyHolder):
@@ -24,7 +23,6 @@ class SubredditSignal(Signal):
     pass
 
 
-@discoverable
 class SubredditFeed(RESTPolling):
     """
     This block polls Reddit feed.
