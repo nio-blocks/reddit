@@ -1,10 +1,64 @@
 {
   "nio/SubredditFeed": {
-    "version": "0.0.1",
-    "description": "",
-    "inputs": {},
-    "outputs": {},
-    "properties": {},
+    "version": "0.1.0",
+    "description": "Polls the `new` Reddit feed [https://www.reddit.com/r/all/new.json](https://www.reddit.com/r/<subreddit name>/new.json) and returns the most recent posts from each specified (queried) subreddit.  Can use `all` to get all Reddit posts or `random` to get a random subreddit.",
+    "properties": {
+      "creds": {
+        "title": "Credentials",
+        "type": "ObjectType",
+        "description": "Reddit API credentials.",
+        "default": {
+          "app_username": "[[REDDIT_USERNAME]]",
+          "app_password": "[[REDDIT_PASSWORD]]",
+          "app_secret": "[[REDDIT_SECRET]]",
+          "client_id": "[[REDDIT_CLIENT_ID]]"
+        }
+      },
+      "include_query": {
+        "title": "Include Query Field",
+        "type": "StringType",
+        "description": "Whether to include queries in request to facebook.",
+        "default": null
+      },
+      "polling_interval": {
+        "title": "Polling Interval",
+        "type": "TimeDeltaType",
+        "description": "How often Reddit is polled. When using more than one query. Each query will be polled at a period equal to the *polling interval* times the number of queries.",
+        "default": {
+          "seconds": 20
+        }
+      },
+      "queries": {
+        "title": "Query Strings",
+        "type": "ListType",
+        "description": "Queries to include on request to Reddit.",
+        "default": []
+      },
+      "retry_interval": {
+        "title": "Retry Interval",
+        "type": "TimeDeltaType",
+        "description": "When a url request fails, how long to wait before attempting to try again.",
+        "default": {
+          "seconds": 60
+        }
+      },
+      "retry_limit": {
+        "title": "Retry Limit",
+        "type": "IntType",
+        "description": "Number if times to retry on a poll.",
+        "default": 3
+      }
+    },
+    "inputs": {
+      "default": {
+        "description": "Any list of signals."
+      }
+    },
+    "outputs": {
+      "default": {
+        "description": "Creates a new signal for each Reddit post. Every field on the Post will become a signal attribute. Details about the Reddit Posts can be found [here](https://github.com/reddit/reddit/wiki/JSON#link-implements-votable--created)."
+      }
+    },
     "commands": {}
   }
 }
