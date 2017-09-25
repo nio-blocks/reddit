@@ -32,7 +32,7 @@ class SubredditFeed(RESTPolling):
     Properties: creds (APICredentials): API credentials
     """
 
-    version = VersionProperty("0.1.1")
+    version = VersionProperty("0.1.2")
 
     URL_FORMAT = ("https://oauth.reddit.com/r/{}/new.json?before={}")
 
