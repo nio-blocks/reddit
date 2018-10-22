@@ -16,6 +16,7 @@ class Creds(PropertyHolder):
     app_username = StringProperty(title='App Username',
                                   default='[[REDDIT_USERNAME]]')
 
+
 class SubredditSignal(Signal):
     pass
 
