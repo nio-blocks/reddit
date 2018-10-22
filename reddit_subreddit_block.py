@@ -15,9 +15,6 @@ class Creds(PropertyHolder):
                                 default='[[REDDIT_SECRET]]')
     app_username = StringProperty(title='App Username',
                                   default='[[REDDIT_USERNAME]]')
-    app_password = StringProperty(title='App Password',
-                                  default='[[REDDIT_PASSWORD]]')
-
 
 class SubredditSignal(Signal):
     pass
@@ -98,9 +95,7 @@ class SubredditFeed(RESTPolling):
         self.logger.debug("Obtaining access token")
         client_auth = requests.auth.HTTPBasicAuth(self.creds().client_id(),
                                                   self.creds().app_secret())
-        post_data = {"grant_type": "password",
-                     "username": self.creds().app_username(),
-                     "password": self.creds().app_password()}
+        post_data = "grant_type=client_credentials"
         headers = {"User-Agent": "nio"}
         response = requests.post("https://www.reddit.com/api/v1/access_token",
                                  auth=client_auth,
