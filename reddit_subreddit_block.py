@@ -4,7 +4,7 @@ from nio.properties import PropertyHolder, StringProperty, \
     ObjectProperty, VersionProperty
 from nio.signal.base import Signal
 
-from .rest_polling.rest_block import RESTPolling
+from .rest_polling.rest_polling_base import RESTPolling
 
 
 class Creds(PropertyHolder):
