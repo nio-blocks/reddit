@@ -32,7 +32,7 @@ class SubredditFeed(RESTPolling):
     """
     queries = ListProperty(StringType, title='Subreddit', default=['all'])
 
-    version = VersionProperty("0.1.2")
+    version = VersionProperty("1.0.0")
 
     URL_FORMAT = ("https://oauth.reddit.com/r/{}/new.json?before={}")
 

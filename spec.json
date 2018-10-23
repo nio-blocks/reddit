@@ -1,6 +1,6 @@
 {
   "nio/SubredditFeed": {
-    "version": "0.1.2",
+    "version": "1.0.0",
     "description": "Polls the `new` Reddit feed (https://www.reddit.com/r/all/new.json) and returns the most recent posts from each specified (queried) subreddit.  Can use `all` to get all Reddit posts.",
     "categories": [
       "Social Media",
