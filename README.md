@@ -1,15 +1,15 @@
 SubredditFeed
 =============
-Polls the `new` Reddit feed [https://www.reddit.com/r/all/new.json](https://www.reddit.com/r/<subreddit name>/new.json) and returns the most recent posts from each specified (queried) subreddit.  Can use `all` to get all Reddit posts or `random` to get a random subreddit.
+Polls the `new` Reddit feed (https://www.reddit.com/r/all/new.json) and returns the most recent posts from each specified (queried) subreddit.  Can use `all` to get all Reddit posts.
 
 Properties
 ----------
 - **creds**: Reddit API credentials.
-- **include_query**: Whether to include queries in request to facebook.
-- **polling_interval**: How often Reddit is polled. When using more than one query. Each query will be polled at a period equal to the *polling interval* times the number of queries.
-- **queries**: Queries to include on request to Reddit.
-- **retry_interval**: When a url request fails, how long to wait before attempting to try again.
-- **retry_limit**: Number if times to retry on a poll.
+- **include_query**: If not None, the endpoint for this request, from queries, will be stored in this attribute of the outgoing signal.
+- **polling_interval**: How often reddit is polled. A new request will be made for every member of queries at the polling_interval.
+- **queries**: List of subreddits to poll.
+- **retry_interval**: When a request to reddit fails, wait this many seconds before attempting a retry.
+- **retry_limit**: The maximum number of retries to attempt for each request.
 
 Inputs
 ------
@@ -30,7 +30,6 @@ requests
 Output Example
 --------------
 The following is a sample of commonly included attributes, but note that not all will be included on every signal:
-
 ```
 {
   domain: string,
@@ -39,7 +38,7 @@ The following is a sample of commonly included attributes, but note that not all
   selftext: string,
   likes: int,
   user_reports: array,
-  id: string, 
+  id: string,
   archived: boolean,
   clicked: boolean,
   author: string,
@@ -60,3 +59,4 @@ The following is a sample of commonly included attributes, but note that not all
   visited: boolean,
 }
 ```
+

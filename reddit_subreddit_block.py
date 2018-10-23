@@ -1,10 +1,11 @@
 import requests
 
 from nio.properties import PropertyHolder, StringProperty, \
-    ObjectProperty, VersionProperty
+    ObjectProperty, VersionProperty, ListProperty
 from nio.signal.base import Signal
+from nio.types import StringType
 
-from .rest_polling.rest_block import RESTPolling
+from .rest_polling.rest_polling_base import RESTPolling
 
 
 class Creds(PropertyHolder):
@@ -15,8 +16,6 @@ class Creds(PropertyHolder):
                                 default='[[REDDIT_SECRET]]')
     app_username = StringProperty(title='App Username',
                                   default='[[REDDIT_USERNAME]]')
-    app_password = StringProperty(title='App Password',
-                                  default='[[REDDIT_PASSWORD]]')
 
 
 class SubredditSignal(Signal):
@@ -31,6 +30,7 @@ class SubredditFeed(RESTPolling):
 
     Properties: creds (APICredentials): API credentials
     """
+    queries = ListProperty(StringType, title='Subreddit', default=['all'])
 
     version = VersionProperty("0.1.2")
 
@@ -98,9 +98,7 @@ class SubredditFeed(RESTPolling):
         self.logger.debug("Obtaining access token")
         client_auth = requests.auth.HTTPBasicAuth(self.creds().client_id(),
                                                   self.creds().app_secret())
-        post_data = {"grant_type": "password",
-                     "username": self.creds().app_username(),
-                     "password": self.creds().app_password()}
+        post_data = "grant_type=client_credentials"
         headers = {"User-Agent": "nio"}
         response = requests.post("https://www.reddit.com/api/v1/access_token",
                                  auth=client_auth,

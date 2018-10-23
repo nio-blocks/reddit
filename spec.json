@@ -1,7 +1,7 @@
 {
   "nio/SubredditFeed": {
     "version": "0.1.2",
-    "description": "Polls the `new` Reddit feed [https://www.reddit.com/r/all/new.json](https://www.reddit.com/r/<subreddit name>/new.json) and returns the most recent posts from each specified (queried) subreddit.  Can use `all` to get all Reddit posts or `random` to get a random subreddit.",
+    "description": "Polls the `new` Reddit feed (https://www.reddit.com/r/all/new.json) and returns the most recent posts from each specified (queried) subreddit.  Can use `all` to get all Reddit posts.",
     "categories": [
       "Social Media",
       "Web Data"
@@ -12,36 +12,37 @@
         "type": "ObjectType",
         "description": "Reddit API credentials.",
         "default": {
-          "app_username": "[[REDDIT_USERNAME]]",
-          "app_password": "[[REDDIT_PASSWORD]]",
+          "client_id": "[[REDDIT_CLIENT_ID]]",
           "app_secret": "[[REDDIT_SECRET]]",
-          "client_id": "[[REDDIT_CLIENT_ID]]"
+          "app_username": "[[REDDIT_USERNAME]]"
         }
       },
       "include_query": {
         "title": "Include Query Field",
         "type": "StringType",
-        "description": "Whether to include queries in request to facebook.",
+        "description": "If not None, the endpoint for this request, from queries, will be stored in this attribute of the outgoing signal.",
         "default": null
       },
       "polling_interval": {
         "title": "Polling Interval",
         "type": "TimeDeltaType",
-        "description": "How often Reddit is polled. When using more than one query. Each query will be polled at a period equal to the *polling interval* times the number of queries.",
+        "description": "How often reddit is polled. A new request will be made for every member of queries at the polling_interval.",
         "default": {
           "seconds": 20
         }
       },
       "queries": {
-        "title": "Query Strings",
+        "title": "Subreddit",
         "type": "ListType",
-        "description": "Queries to include on request to Reddit.",
-        "default": []
+        "description": "List of subreddits to poll.",
+        "default": [
+          "all"
+        ]
       },
       "retry_interval": {
         "title": "Retry Interval",
         "type": "TimeDeltaType",
-        "description": "When a url request fails, how long to wait before attempting to try again.",
+        "description": "When a request to reddit fails, wait this many seconds before attempting a retry.",
         "default": {
           "seconds": 60
         }
@@ -49,7 +50,7 @@
       "retry_limit": {
         "title": "Retry Limit",
         "type": "IntType",
-        "description": "Number of times to retry on a poll.",
+        "description": "The maximum number of retries to attempt for each request.",
         "default": 3
       }
     },
