@@ -5,7 +5,7 @@ Polls the `new` Reddit feed (https://www.reddit.com/r/all/new.json) and returns 
 Properties
 ----------
 - **creds**: Reddit API credentials.
-- **include_query**: Whether to include queries in request to reddit.
+- **include_query**: If not None, the parameters of the active request to reddit will be stored in this attribute of the outgoing signal.
 - **polling_interval**: How often Reddit is polled. When using more than one query. Each query will be polled at a period equal to the *polling interval* times the number of queries.
 - **queries**: Queries to include on request to Reddit.
 - **retry_interval**: When a url request fails, how long to wait before attempting to try again.

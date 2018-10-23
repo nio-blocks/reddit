@@ -20,7 +20,7 @@
       "include_query": {
         "title": "Include Query Field",
         "type": "StringType",
-        "description": "Whether to include queries in request to reddit.",
+        "description": "If not None, the parameters of the active request to reddit will be stored in this attribute of the outgoing signal.",
         "default": null
       },
       "polling_interval": {
