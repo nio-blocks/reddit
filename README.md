@@ -5,11 +5,11 @@ Polls the `new` Reddit feed (https://www.reddit.com/r/all/new.json) and returns 
 Properties
 ----------
 - **creds**: Reddit API credentials.
-- **include_query**: If not None, the parameters of the active request to reddit will be stored in this attribute of the outgoing signal.
-- **polling_interval**: How often Reddit is polled. When using more than one query. Each query will be polled at a period equal to the *polling interval* times the number of queries.
-- **queries**: Queries to include on request to Reddit.
-- **retry_interval**: When a url request fails, how long to wait before attempting to try again.
-- **retry_limit**: Number of times to retry on a poll.
+- **include_query**: If not None, the endpoint for this request, from queries, will be stored in this attribute of the outgoing signal.
+- **polling_interval**: How often reddit is polled. A new request will be made for every member of queries at the polling_interval.
+- **queries**: List of subreddits to poll.
+- **retry_interval**: When a request to reddit fails, wait this many seconds before attempting a retry.
+- **retry_limit**: The maximum number of retries to attempt for each request.
 
 Inputs
 ------

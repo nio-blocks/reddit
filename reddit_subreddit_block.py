@@ -1,8 +1,9 @@
 import requests
 
 from nio.properties import PropertyHolder, StringProperty, \
-    ObjectProperty, VersionProperty
+    ObjectProperty, VersionProperty, ListProperty
 from nio.signal.base import Signal
+from nio.types import StringType
 
 from .rest_polling.rest_polling_base import RESTPolling
 
@@ -29,6 +30,7 @@ class SubredditFeed(RESTPolling):
 
     Properties: creds (APICredentials): API credentials
     """
+    queries = ListProperty(StringType, title='Subreddit', default=['all'])
 
     version = VersionProperty("0.1.2")
 
